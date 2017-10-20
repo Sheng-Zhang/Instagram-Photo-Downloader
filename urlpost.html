@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html> <!-- urlpost.html -->
+  <head>
+    <title>Instagram Photo Downloader</title>
+  </head>
+  <body style='text-align:center'>
+    <input id="igurl" type="text" onkeydown="resend(event);" size="100">
+    <h1> Paste instagram url</h1>
+    
+        
+    <div id='info'>This sentence will be replaced</div>
+    <img id="igimage" src="">
+    <script>
+      
+      function resend(e) 
+      {
+        console.log("e.keyCode: " + e.keyCode);
+        if (e.keyCode == 13) { 
+          
+          
+          cleanUrl = document.getElementById("igurl").value.slice(8)
+          params = "url=" + cleanUrl
+          //console.log(params)
+        
+          request = new ajaxRequest()
+        
+          request.open("POST", "urlpost.php", true)
+          request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+          //request.setRequestHeader("Content-length", params.length)
+          //request.setRequestHeader("Connection", "close")
+            
+          request.onreadystatechange = function()
+          {
+            if (this.readyState == 4)
+            {
+              if (this.status == 200)
+              {
+                if (this.responseText != null)
+                {
+                  console.log(this.responseText)
+                  console.log(this.reponseXML)
+                  document.getElementById('info').innerHTML = this.responseText
+                  var metas = document.getElementsByTagName('meta');
+                  console.log(metas.length);
+                  for (i = 1; i < metas.length; i++){
+                    console.log(metas[i].getAttribute("property"))
+                    if (metas[i].getAttribute("property") == "og:image")
+                    {
+                      var imageURL = metas[i].getAttribute("content")
+                      console.log(imageURL)
+                      document.getElementById("igimage").src = imageURL
+
+                    }
+                  }
+                }
+                else alert("Ajax error: No data received")
+              }
+              else alert( "Ajax error: " + this.statusText)
+            }
+          }
+          
+          
+          
+          request.send(params)
+        }
+      }
+      
+      function ajaxRequest()
+      {
+        try
+        {
+          var request = new XMLHttpRequest()
+        }
+        catch(e1)
+        {
+          try
+          {
+            request = new ActiveXObject("Msxml2.XMLHTTP")
+          }
+          catch(e2)
+          {
+            try
+            {
+              request = new ActiveXObject("Microsoft.XMLHTTP")
+            }
+            catch(e3)
+            {
+              request = false
+            }
+          }
+        }
+        return request
+      }
+    </script>
+  </body>
+</html>
